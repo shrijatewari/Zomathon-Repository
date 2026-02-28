@@ -233,7 +233,7 @@ def save_results_summary(stats, output_path='analysis/results_summary.csv'):
     print(f"\nResults summary saved to {output_path}")
 
 
-def plot_comparison(df, output_path='analysis/signal_comparison.png'):
+def plot_comparison(df, stats=None, output_path='analysis/signal_comparison.png'):
     """
     Create histogram comparison plot of ObservedPrepTime vs ReconstructedPrepTime.
     
@@ -241,6 +241,8 @@ def plot_comparison(df, output_path='analysis/signal_comparison.png'):
     -----------
     df : pd.DataFrame
         Dataset containing ObservedPrepTime and ReconstructedPrepTime columns
+    stats : dict, optional
+        Dictionary containing computed statistics (for displaying MAE values)
     output_path : str
         Path to save the plot image
     """
@@ -249,6 +251,22 @@ def plot_comparison(df, output_path='analysis/signal_comparison.png'):
     # Extract preparation time columns
     observed = df['ObservedPrepTime']
     reconstructed = df['ReconstructedPrepTime']
+    
+    # Compute statistics if not provided
+    if stats is None:
+        mean_observed = observed.mean()
+        mean_reconstructed = reconstructed.mean()
+        var_observed = observed.var()
+        var_reconstructed = reconstructed.var()
+        mae_observed = np.mean(np.abs(observed - mean_observed))
+        mae_reconstructed = np.mean(np.abs(reconstructed - mean_reconstructed))
+    else:
+        mean_observed = stats.get('mean_observed', observed.mean())
+        mean_reconstructed = stats.get('mean_reconstructed', reconstructed.mean())
+        var_observed = stats.get('var_observed', observed.var())
+        var_reconstructed = stats.get('var_reconstructed', reconstructed.var())
+        mae_observed = stats.get('mae_observed', np.mean(np.abs(observed - observed.mean())))
+        mae_reconstructed = stats.get('mae_reconstructed', np.mean(np.abs(reconstructed - reconstructed.mean())))
     
     # Create figure with proper formatting
     plt.figure(figsize=(12, 7))
@@ -271,17 +289,30 @@ def plot_comparison(df, output_path='analysis/signal_comparison.png'):
     plt.title('Preparation Time Signal Comparison', fontsize=16, fontweight='bold', pad=20)
     plt.xlabel('Preparation Time (minutes)', fontsize=14, fontweight='bold')
     plt.ylabel('Number of Orders', fontsize=14, fontweight='bold')
-    plt.legend(fontsize=12, loc='upper right')
     plt.grid(True, alpha=0.3, linestyle='--')
     
     # Add vertical lines for means
-    plt.axvline(observed.mean(), color='blue', linestyle='--', linewidth=2, 
-                alpha=0.7, label=f'Observed Mean: {observed.mean():.2f}')
-    plt.axvline(reconstructed.mean(), color='red', linestyle='--', linewidth=2, 
-                alpha=0.7, label=f'Reconstructed Mean: {reconstructed.mean():.2f}')
+    mean_obs = mean_observed
+    mean_recon = mean_reconstructed
+    plt.axvline(mean_obs, color='blue', linestyle='--', linewidth=2, alpha=0.7)
+    plt.axvline(mean_recon, color='red', linestyle='--', linewidth=2, alpha=0.7)
     
-    # Update legend to include mean lines
-    plt.legend(fontsize=11, loc='upper right')
+    # Create legend with mean, variance, and MAE values
+    legend_labels = [
+        f'ObservedPrepTime\n(Mean: {mean_obs:.2f} min, Var: {var_observed:.2f}, MAE: {mae_observed:.2f} min)',
+        f'ReconstructedPrepTime\n(Mean: {mean_recon:.2f} min, Var: {var_reconstructed:.2f}, MAE: {mae_reconstructed:.2f} min)'
+    ]
+    plt.legend(legend_labels, fontsize=10, loc='upper right', framealpha=0.9)
+    
+    # Add text annotation showing improvements
+    mae_improvement = ((mae_observed - mae_reconstructed) / mae_observed) * 100
+    var_improvement = ((var_observed - var_reconstructed) / var_observed) * 100
+    textstr = (f'Signal Quality Improvements:\n'
+               f'• {mae_improvement:.1f}% reduction in MAE\n'
+               f'• {var_improvement:.1f}% reduction in Variance')
+    plt.text(0.02, 0.98, textstr, transform=plt.gca().transAxes, 
+             fontsize=11, verticalalignment='top', bbox=dict(boxstyle='round', 
+             facecolor='wheat', alpha=0.8))
     
     # Tight layout for better appearance
     plt.tight_layout()
@@ -328,8 +359,8 @@ def main():
     # Step 3: Save results summary
     save_results_summary(stats, output_path='analysis/results_summary.csv')
     
-    # Step 4: Generate comparison plot
-    plot_comparison(df, output_path='analysis/signal_comparison.png')
+    # Step 4: Generate comparison plot (pass stats to include MAE values)
+    plot_comparison(df, stats=stats, output_path='analysis/signal_comparison.png')
     
     print("\n" + "="*60)
     print("ANALYSIS COMPLETE")
