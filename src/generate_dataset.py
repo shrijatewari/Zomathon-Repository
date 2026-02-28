@@ -1,10 +1,4 @@
 """
-Dataset Generation Script for Kitchen Prep Time (KPT) Prediction System
-
-This script generates a synthetic dataset simulating a food delivery platform's
-order processing pipeline. It models the relationship between kitchen load,
-prep time, and rider pickup timing.
-
 The dataset includes:
 - Order metadata (order_id, restaurant_id, order_time)
 - Kitchen load indicators (queue_length, orders_last_10min)
