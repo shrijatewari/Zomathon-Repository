@@ -15,8 +15,6 @@ import os
 
 def generate_dataset(n_samples=5000, start_date=None, random_seed=42):
     """
-    Generate synthetic dataset for KPT prediction.
-    
     Parameters:
     -----------
     n_samples : int
@@ -124,13 +122,12 @@ def generate_dataset(n_samples=5000, start_date=None, random_seed=42):
     df = pd.DataFrame(data)
     
     # Convert timedelta columns to minutes for easier analysis
-    # Keep timestamps as datetime objects for realism
     return df
 
 
 def save_dataset(df, output_path='data/dataset.csv'):
     """
-    Save dataset to CSV file.
+    This will save dataset to CSV file.
     
     Parameters:
     -----------
