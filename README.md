@@ -2,6 +2,10 @@
 
 A production-grade machine learning system for predicting kitchen preparation time in food delivery platforms. This system simulates real-world scenarios with dataset generation, telemetry modeling, ground truth reconstruction, and prediction capabilities.
 
+## 🚀 Live Demo
+
+**[PrepSense Streamlit Dashboard](https://zomathon-repository-dcr3grxm3ryk6r3wyopgv7.streamlit.app/)** – Interactive demo with signal intelligence, prediction engine, and dispatch optimization.
+
 ## 📋 Table of Contents
 
 - [System Overview](#system-overview)
