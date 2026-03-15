@@ -45,3 +45,14 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# Binaries (ngrok, cloudflared)
+ngrok
+cloudflared
+*.zip
